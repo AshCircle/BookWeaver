@@ -10,3 +10,4 @@ body:
       placeholder: API 문서 작성, ISSUE_TEMPLATE 수정 등
     validations:
       required: true
+

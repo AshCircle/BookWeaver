@@ -10,3 +10,4 @@ body:
       placeholder: 중복 로직 제거, 가독성 향상, 모듈화 등
     validations:
       required: true
+

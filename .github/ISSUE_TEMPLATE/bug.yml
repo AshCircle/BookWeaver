@@ -10,3 +10,4 @@ body:
       placeholder: 예) 특정 API에서 500 오류 발생
     validations:
       required: true
+

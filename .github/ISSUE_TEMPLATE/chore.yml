@@ -10,3 +10,4 @@ body:
       placeholder: 의존성 업데이트, CI 설정 변경, 빌드 스크립트 수정 등
     validations:
       required: true
+
