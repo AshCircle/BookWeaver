@@ -9,7 +9,7 @@
 | 3 | **Structure** | sources[] | chunks + 잠정 목차 | (a) 규칙 기반으로 heading 추출 (b) LLM에게 "잠정 목차 후보" 합치게 요청 |
 | 4 | **Cluster** | chunks | chunk ↔ chapter 매핑 | 각 chunk 임베딩 → sqlite-vec KNN → 잠정 목차 항목별 그룹화 |
 | 5 | **Synthesis** | 그룹화된 chunks | chapters[] (3가지 density) | 챕터마다 LLM 호출, **map-reduce 패턴**으로 토큰 한계 회피 |
-| 6 | **Viewer** | chapters[] | (UI에서 렌더) | React 측이 DB 직접 조회 |
+| 6 | **Viewer** | chapters[] | (UI에서 렌더) | React가 `get_book` / `list_books` IPC로 조회 (직접 DB 접근 없음) |
 
 ---
 
@@ -52,7 +52,8 @@
 
 ## Stage 6: Viewer
 
-- 백엔드 작업 없음 — React가 SQLite에서 직접 조회.
+- 새 파이프라인 단계는 없음. 데이터 조회는 [FRONTEND.md#ipc-래퍼](FRONTEND.md#ipc-래퍼) 의 `get_book(id)` / `list_books()` IPC를 통해서만 수행하며, 프런트엔드는 SQLite에 직접 접근하지 않는다.
+- 챕터 본문·인용 출처 조인 등 Viewer가 필요로 하는 read 쿼리는 Rust 측 command로 노출해야 한다 (e.g. `get_chapters(book_id)`, `get_chapter_sources(chapter_id)`).
 - `books.status='ready'`로 전환되면 [UC-04 Read Weaved Book](USECASES.md#uc-04-read-weaved-book) 이 가능해진다.
 
 ---
