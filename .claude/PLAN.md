@@ -10,5 +10,3 @@
 | [PIPELINE.md](PIPELINE.md) | 6단계 파이프라인 상세 — search/collect/structure/cluster/synthesis 작업 시 |
 | [FRONTEND.md](FRONTEND.md) | 라우트·컴포넌트·UX 토글 — UI 작업 시 |
 | [ROADMAP.md](ROADMAP.md) | Critical files, 구현 순서, 검증 — 작업 우선순위 판단 시 |
-
-원본 비전 문서는 [draft.md](draft.md)에 그대로 유지.

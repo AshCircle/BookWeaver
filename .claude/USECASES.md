@@ -79,7 +79,7 @@
 | **Actor** | Reader |
 | **Goal** | 요약 강도(Light / Medium / Deep)를 토글하여 같은 챕터를 다른 깊이로 읽는다. |
 | **Precondition** | UC-04 진행 중. 챕터의 `summary_light`, `summary_med`, `summary_deep` 모두 채워져 있음. |
-| **Main Flow** | 1. Reader가 DensitySwitch 컴포넌트에서 Light/Medium/Deep 중 하나를 선택한다.<br>2. URL이 `/book/:id?density=light|medium|deep`로 갱신된다.<br>3. 본문이 해당 컬럼의 텍스트로 즉시 교체된다. |
+| **Main Flow** | 1. Reader가 DensitySwitch 컴포넌트에서 Light/Medium/Deep 중 하나를 선택한다.<br>2. URL이 `/book/:id?density=light\|medium\|deep`로 갱신된다.<br>3. 본문이 해당 컬럼의 텍스트로 즉시 교체된다. |
 | **Alternative Flow** | - 특정 density가 비어있으면 (구버전 book) 회색 표시 + "재합성 필요" 안내 (UC-09 유도). |
 | **Postcondition** | URL과 UI 상태 동기화. DB 변동 없음. |
 | **구현 참조** | [PIPELINE.md#stage-5-synthesis](PIPELINE.md#stage-5-synthesis), [FRONTEND.md#viewer-route](FRONTEND.md#viewer-route) |
