@@ -80,8 +80,7 @@ BookWeaver/
 ├── package.json
 ├── tsconfig.json
 ├── tailwind.config.ts
-├── vite.config.ts
-└── draft.md
+└── vite.config.ts
 ```
 
 ---
