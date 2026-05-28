@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use crate::config::{ProviderKind, UserConfig};
 use crate::error::Result;
 
-pub mod claude;
+pub mod gemini;
 pub mod ollama;
 pub mod openai;
 
@@ -49,9 +49,9 @@ pub trait AiProvider: Send + Sync {
 /// 사용자 config로부터 provider를 만든다. 키 누락 시 None.
 pub fn build_provider(cfg: &UserConfig) -> Option<Box<dyn AiProvider>> {
     match cfg.provider {
-        ProviderKind::Claude => {
-            let key = cfg.anthropic_key()?;
-            Some(Box::new(claude::ClaudeProvider::new(key, cfg.model.clone())))
+        ProviderKind::Gemini => {
+            let key = cfg.gemini_key()?;
+            Some(Box::new(gemini::GeminiProvider::new(key, cfg.model.clone())))
         }
         ProviderKind::OpenAI => None, // TODO: 다음 세션
         ProviderKind::Ollama => None, // TODO: 다음 세션

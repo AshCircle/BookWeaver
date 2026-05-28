@@ -15,7 +15,7 @@ pub struct SettingsView {
     pub provider: ProviderKind,
     pub model: String,
     pub language: String,
-    pub has_anthropic_key: bool,
+    pub has_gemini_key: bool,
     pub has_openai_key: bool,
     pub has_tavily_key: bool,
     pub ollama_endpoint: Option<String>,
@@ -27,7 +27,7 @@ impl From<&UserConfig> for SettingsView {
             provider: c.provider,
             model: c.model.clone(),
             language: c.language.clone(),
-            has_anthropic_key: c.anthropic_key().is_some(),
+            has_gemini_key: c.gemini_key().is_some(),
             has_openai_key: c.openai_api_key.as_deref().map(|s| !s.is_empty()).unwrap_or(false),
             has_tavily_key: c.tavily_key().is_some(),
             ollama_endpoint: c.ollama_endpoint.clone(),
@@ -40,7 +40,7 @@ pub struct SettingsUpdate {
     pub provider: Option<ProviderKind>,
     pub model: Option<String>,
     pub language: Option<String>,
-    pub anthropic_api_key: Option<String>,
+    pub gemini_api_key: Option<String>,
     pub openai_api_key: Option<String>,
     pub tavily_api_key: Option<String>,
     pub ollama_endpoint: Option<String>,
@@ -160,8 +160,8 @@ pub async fn update_settings(
     if let Some(l) = patch.language {
         cfg.language = l;
     }
-    if let Some(k) = patch.anthropic_api_key {
-        cfg.anthropic_api_key = if k.is_empty() { None } else { Some(k) };
+    if let Some(k) = patch.gemini_api_key {
+        cfg.gemini_api_key = if k.is_empty() { None } else { Some(k) };
     }
     if let Some(k) = patch.openai_api_key {
         cfg.openai_api_key = if k.is_empty() { None } else { Some(k) };

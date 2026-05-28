@@ -7,14 +7,14 @@ use crate::error::{AppError, Result};
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum ProviderKind {
-    Claude,
+    Gemini,
     OpenAI,
     Ollama,
 }
 
 impl Default for ProviderKind {
     fn default() -> Self {
-        ProviderKind::Claude
+        ProviderKind::Gemini
     }
 }
 
@@ -25,7 +25,7 @@ pub struct UserConfig {
     pub model: String,
     pub language: String, // "ko" | "en"
     #[serde(default)]
-    pub anthropic_api_key: Option<String>,
+    pub gemini_api_key: Option<String>,
     #[serde(default)]
     pub openai_api_key: Option<String>,
     #[serde(default)]
@@ -37,10 +37,10 @@ pub struct UserConfig {
 impl Default for UserConfig {
     fn default() -> Self {
         Self {
-            provider: ProviderKind::Claude,
-            model: "claude-opus-4-7".to_string(),
+            provider: ProviderKind::Gemini,
+            model: "gemini-2.0-flash".to_string(),
             language: "ko".to_string(),
-            anthropic_api_key: None,
+            gemini_api_key: None,
             openai_api_key: None,
             tavily_api_key: None,
             ollama_endpoint: Some("http://localhost:11434".to_string()),
@@ -49,11 +49,11 @@ impl Default for UserConfig {
 }
 
 impl UserConfig {
-    pub fn anthropic_key(&self) -> Option<String> {
-        self.anthropic_api_key
+    pub fn gemini_key(&self) -> Option<String> {
+        self.gemini_api_key
             .clone()
             .filter(|s| !s.trim().is_empty())
-            .or_else(|| std::env::var("ANTHROPIC_API_KEY").ok())
+            .or_else(|| std::env::var("GEMINI_API_KEY").ok())
     }
 
     pub fn tavily_key(&self) -> Option<String> {

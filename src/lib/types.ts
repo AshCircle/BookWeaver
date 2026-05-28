@@ -52,13 +52,13 @@ export interface ProgressEvent {
   message?: string;
 }
 
-export type ProviderKind = "claude" | "openai" | "ollama";
+export type ProviderKind = "gemini" | "openai" | "ollama";
 
 export interface Settings {
   provider: ProviderKind;
   model: string;
   language: string;
-  has_anthropic_key: boolean;
+  has_gemini_key: boolean;
   has_openai_key: boolean;
   has_tavily_key: boolean;
   ollama_endpoint: string | null;
@@ -68,7 +68,7 @@ export interface SettingsUpdate {
   provider?: ProviderKind;
   model?: string;
   language?: string;
-  anthropic_api_key?: string;
+  gemini_api_key?: string;
   openai_api_key?: string;
   tavily_api_key?: string;
   ollama_endpoint?: string;

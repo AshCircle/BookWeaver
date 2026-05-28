@@ -10,9 +10,9 @@ import type { ProviderKind, Settings, TestProviderResult } from "@/lib/types";
 export default function SettingsPage() {
   const { t, lang, setLang } = useT();
   const [settings, setSettings] = useState<Settings | null>(null);
-  const [provider, setProvider] = useState<ProviderKind>("claude");
+  const [provider, setProvider] = useState<ProviderKind>("gemini");
   const [model, setModel] = useState("");
-  const [anthropicKey, setAnthropicKey] = useState("");
+  const [geminiKey, setGeminiKey] = useState("");
   const [tavilyKey, setTavilyKey] = useState("");
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
@@ -35,11 +35,11 @@ export default function SettingsPage() {
         provider,
         model,
         language: lang,
-        anthropic_api_key: anthropicKey ? anthropicKey : undefined,
+        gemini_api_key: geminiKey ? geminiKey : undefined,
         tavily_api_key: tavilyKey ? tavilyKey : undefined,
       });
       setSettings(next);
-      setAnthropicKey("");
+      setGeminiKey("");
       setTavilyKey("");
     } catch (err) {
       console.error(err);
@@ -74,7 +74,7 @@ export default function SettingsPage() {
           onChange={(e) => setProvider(e.target.value as ProviderKind)}
           className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900"
         >
-          <option value="claude">Claude</option>
+          <option value="gemini">Gemini</option>
           <option value="openai" disabled>
             OpenAI (TODO)
           </option>
@@ -92,25 +92,25 @@ export default function SettingsPage() {
           type="text"
           value={model}
           onChange={(e) => setModel(e.target.value)}
-          placeholder="claude-opus-4-7"
+          placeholder="gemini-2.0-flash"
           className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900"
         />
       </section>
 
       <section className="space-y-3">
         <label className="block text-sm font-medium">
-          {t("settings.anthropic_key")}{" "}
+          {t("settings.gemini_key")}{" "}
           <span className="ml-2 text-xs text-zinc-500">
-            ({settings?.has_anthropic_key
+            ({settings?.has_gemini_key
               ? t("settings.key_set")
               : t("settings.key_unset")})
           </span>
         </label>
         <input
           type="password"
-          value={anthropicKey}
-          onChange={(e) => setAnthropicKey(e.target.value)}
-          placeholder="sk-ant-..."
+          value={geminiKey}
+          onChange={(e) => setGeminiKey(e.target.value)}
+          placeholder="AIza..."
           className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900"
         />
       </section>

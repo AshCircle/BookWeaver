@@ -12,7 +12,7 @@
 - **Frontend**: React 18 + TypeScript + TailwindCSS + Vite (in Tauri WebView)
 - **Backend**: Tauri 2.x (Rust) + Tokio + reqwest
 - **Storage**: SQLite (`rusqlite` + `sqlite-vec`)
-- **AI**: Claude (Anthropic Messages API) — OpenAI/Ollama는 trait stub만
+- **AI**: Gemini (Google Generative Language API) — OpenAI/Ollama는 trait stub만
 - **Search**: Tavily
 
 ## 사전 요구사항
@@ -49,7 +49,7 @@ npm run tauri dev
 
 ## 사용 흐름
 
-1. 앱이 뜨면 `/settings`로 가서 **Anthropic API Key**와 **Tavily API Key**를 입력 후 **저장**.
+1. 앱이 뜨면 `/settings`로 가서 **Gemini API Key**와 **Tavily API Key**를 입력 후 **저장**.
 2. **테스트 호출** 버튼으로 키 연결 확인.
 3. `/`에서 책 제목 입력 → 자동으로 `/library`로 이동.
 4. Library 카드의 ProgressTimeline이 Search → Collect → Structure(stub) → Cluster(stub) → Synthesis(stub) → Ready 순으로 흐른다.
@@ -62,7 +62,7 @@ BookWeaver/
 ├── .claude/                # 설계 문서 (OVERVIEW, USECASES, ARCHITECTURE, PIPELINE, FRONTEND, ROADMAP)
 ├── src-tauri/              # Rust 백엔드 (Tauri 2)
 │   ├── src/
-│   │   ├── ai/             # AiProvider trait + Claude/OpenAI/Ollama
+│   │   ├── ai/             # AiProvider trait + Gemini/OpenAI/Ollama
 │   │   ├── db/             # SQLite + 스키마 + repo
 │   │   ├── pipeline/       # 6단계 orchestrator
 │   │   ├── scrape/         # 본문 추출
