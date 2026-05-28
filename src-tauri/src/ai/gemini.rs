@@ -5,7 +5,7 @@ use serde_json::json;
 use super::{AiProvider, Prompt};
 use crate::error::{AppError, Result};
 
-const DEFAULT_MODEL: &str = "gemini-2.0-flash";
+const DEFAULT_MODEL: &str = "gemini-2.5-flash-lite";
 const DEFAULT_EMBED_MODEL: &str = "text-embedding-004";
 const API_BASE: &str = "https://generativelanguage.googleapis.com/v1beta";
 
@@ -151,5 +151,21 @@ impl AiProvider for GeminiProvider {
 
     fn context_window(&self) -> usize {
         1_000_000
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    #[ignore = "live Gemini API; run with `cargo test -- --ignored` and GEMINI_API_KEY set"]
+    async fn smoke_complete() {
+        let key = std::env::var("GEMINI_API_KEY").expect("GEMINI_API_KEY must be set");
+        let provider = GeminiProvider::new(key, String::new());
+        let prompt = Prompt::new("Reply with exactly the word: ok").max_tokens(16);
+        let out = provider.complete(&prompt).await.expect("gemini complete failed");
+        println!("[gemini] -> {out:?}");
+        assert!(!out.trim().is_empty());
     }
 }

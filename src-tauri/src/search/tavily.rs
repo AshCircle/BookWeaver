@@ -74,3 +74,21 @@ impl SearchProvider for TavilyClient {
         "tavily"
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    #[ignore = "live Tavily API; run with `cargo test -- --ignored` and TAVILY_API_KEY set"]
+    async fn smoke_search() {
+        let key = std::env::var("TAVILY_API_KEY").expect("TAVILY_API_KEY must be set");
+        let client = TavilyClient::new(key, reqwest::Client::new());
+        let hits = client.search("Clean Code 리뷰", 3).await.expect("tavily search failed");
+        println!("[tavily] {} hits", hits.len());
+        for h in &hits {
+            println!("  - {}", h.url);
+        }
+        assert!(!hits.is_empty());
+    }
+}

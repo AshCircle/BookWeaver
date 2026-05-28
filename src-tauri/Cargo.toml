@@ -32,6 +32,7 @@ sqlite-vec = "0.1"
 
 # config
 directories = "5"
+dotenvy = "0.15"
 # NOTE: keyring 의존성은 keyring 마이그레이션 (ROADMAP 8단계) 시점에 추가 예정.
 # 현재는 평문 config.json만 사용한다.
 

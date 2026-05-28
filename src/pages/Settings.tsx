@@ -92,7 +92,7 @@ export default function SettingsPage() {
           type="text"
           value={model}
           onChange={(e) => setModel(e.target.value)}
-          placeholder="gemini-2.0-flash"
+          placeholder="gemini-2.5-flash-lite"
           className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900"
         />
       </section>

@@ -96,4 +96,5 @@ BookWeaver/
 
 - API 키는 **평문 config.json**에 저장됨. ROADMAP 8단계에서 OS keyring으로 이전.
 - `chunk_vectors` 가상 테이블은 sqlite-vec 로드 실패 시 자동 비활성화. 이번 범위에서는 사용 안 함.
-- 아이콘 파일이 비어 있어 `tauri build`(릴리스)는 실패한다. `src-tauri/icons/README.md` 참고.
+- 아이콘은 `src-tauri/icons/source.png`에서 `npm run tauri icon`으로 생성된 placeholder다. 실제 배포 시 교체 권장.
+- 기본 모델은 `gemini-2.5-flash-lite` (무료 티어 할당량 확인됨). `gemini-2.0-flash`는 키에 따라 무료 할당량이 0일 수 있다. 더 강력한 모델은 Settings에서 변경.

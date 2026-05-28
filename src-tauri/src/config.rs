@@ -38,7 +38,7 @@ impl Default for UserConfig {
     fn default() -> Self {
         Self {
             provider: ProviderKind::Gemini,
-            model: "gemini-2.0-flash".to_string(),
+            model: "gemini-2.5-flash-lite".to_string(),
             language: "ko".to_string(),
             gemini_api_key: None,
             openai_api_key: None,

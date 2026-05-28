@@ -16,6 +16,9 @@ use crate::state::AppState;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // 프로젝트 루트의 .env를 프로세스 환경으로 로드한다 (상위 디렉터리 탐색).
+    // dev 시 작업 디렉터리는 src-tauri/ 이므로 부모의 .env를 찾는다.
+    let _ = dotenvy::dotenv();
     init_tracing();
 
     let cfg = config::load().unwrap_or_default();
