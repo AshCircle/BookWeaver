@@ -34,24 +34,41 @@ export default function LibraryPage() {
 
   useEffect(() => {
     refresh();
+    let disposed = false;
     const unlistens: Array<() => void> = [];
+    const register = (p: Promise<() => void>) => {
+      p.then((un) => {
+        if (disposed) {
+          un();
+          return;
+        }
+        unlistens.push(un);
+      }).catch(console.error);
+    };
 
-    onProgress((evt: ProgressEvent) => {
-      setProgress((prev) => ({
-        ...prev,
-        [evt.book_id]: { stage: evt.stage, status: evt.status },
-      }));
-    }).then((un) => unlistens.push(un));
+    register(
+      onProgress((evt: ProgressEvent) => {
+        setProgress((prev) => ({
+          ...prev,
+          [evt.book_id]: { stage: evt.stage, status: evt.status },
+        }));
+      }),
+    );
 
-    onBookReady(() => {
-      refresh();
-    }).then((un) => unlistens.push(un));
+    register(
+      onBookReady(() => {
+        refresh();
+      }),
+    );
 
-    onBookFailed(() => {
-      refresh();
-    }).then((un) => unlistens.push(un));
+    register(
+      onBookFailed(() => {
+        refresh();
+      }),
+    );
 
     return () => {
+      disposed = true;
       unlistens.forEach((un) => un());
     };
   }, []);

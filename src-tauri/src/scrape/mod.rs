@@ -1,7 +1,9 @@
-use scraper::{Html, Selector};
-use url::Url;
+use std::net::IpAddr;
 
-use crate::error::Result;
+use scraper::{Html, Selector};
+use url::{Host, Url};
+
+use crate::error::{AppError, Result};
 
 #[derive(Debug, Clone)]
 pub struct ScrapedDoc {
@@ -13,6 +15,8 @@ pub struct ScrapedDoc {
 }
 
 pub async fn fetch_and_clean(http: &reqwest::Client, url: &str) -> Result<ScrapedDoc> {
+    validate_url(url)?;
+
     let resp = http
         .get(url)
         .header("accept", "text/html,application/xhtml+xml")
@@ -43,6 +47,47 @@ pub async fn fetch_and_clean(http: &reqwest::Client, url: &str) -> Result<Scrape
         raw_html: html,
         clean_text,
     })
+}
+
+/// 외부 검색 결과 URL을 그대로 요청하기 전, 스킴과 호스트를 검증해 내부 자원(SSRF) 접근을 막는다.
+/// 도메인이 내부 IP로 DNS 해석되는 경우는 별도 리졸브가 필요하므로 여기서는 다루지 않는다.
+fn validate_url(url: &str) -> Result<()> {
+    let parsed =
+        Url::parse(url).map_err(|e| AppError::Other(format!("invalid url: {e}")))?;
+
+    match parsed.scheme() {
+        "http" | "https" => {}
+        other => return Err(AppError::Other(format!("unsupported url scheme: {other}"))),
+    }
+
+    match parsed.host() {
+        Some(Host::Domain(d)) if d.eq_ignore_ascii_case("localhost") => {
+            Err(AppError::Other("localhost is not allowed".into()))
+        }
+        Some(Host::Domain(_)) => Ok(()),
+        Some(Host::Ipv4(ip)) => validate_ip(IpAddr::V4(ip)),
+        Some(Host::Ipv6(ip)) => validate_ip(IpAddr::V6(ip)),
+        None => Err(AppError::Other("url has no host".into())),
+    }
+}
+
+fn validate_ip(ip: IpAddr) -> Result<()> {
+    let blocked = match ip {
+        IpAddr::V4(v4) => {
+            v4.is_loopback()
+                || v4.is_unspecified()
+                || v4.is_private()
+                || v4.is_link_local()
+                || v4.is_multicast()
+        }
+        IpAddr::V6(v6) => v6.is_loopback() || v6.is_unspecified() || v6.is_multicast(),
+    };
+    if blocked {
+        return Err(AppError::Other(format!(
+            "address {ip} is not allowed (internal/reserved)"
+        )));
+    }
+    Ok(())
 }
 
 /// 매우 단순한 readability 대용: script/style/nav/header/footer 제거하고

@@ -27,8 +27,10 @@ export default function ViewerPage() {
 
   useEffect(() => {
     if (!bookId) return;
+    let cancelled = false;
     Promise.all([getBook(bookId), getChapters(bookId), getSources(bookId)])
       .then(([b, ch, src]) => {
+        if (cancelled) return;
         setBook(b);
         setChapters(ch);
         setAllSources(src);
@@ -37,6 +39,9 @@ export default function ViewerPage() {
         }
       })
       .catch(console.error);
+    return () => {
+      cancelled = true;
+    };
   }, [bookId]);
 
   useEffect(() => {
@@ -44,7 +49,15 @@ export default function ViewerPage() {
       setSources([]);
       return;
     }
-    getChapterSources(activeId).then(setSources).catch(console.error);
+    let cancelled = false;
+    getChapterSources(activeId)
+      .then((next) => {
+        if (!cancelled) setSources(next);
+      })
+      .catch(console.error);
+    return () => {
+      cancelled = true;
+    };
   }, [activeId]);
 
   const activeChapter = useMemo(
@@ -102,10 +115,10 @@ export default function ViewerPage() {
         <div className="px-3 py-3 border-b border-zinc-200 dark:border-zinc-800 text-sm font-medium">
           {t("viewer.sources")}{" "}
           <span className="text-zinc-500 font-normal">
-            ({sources.length > 0 ? sources.length : allSources.length})
+            ({activeId == null ? allSources.length : sources.length})
           </span>
         </div>
-        <SourceBadges sources={sources.length > 0 ? sources : allSources} />
+        <SourceBadges sources={activeId == null ? allSources : sources} />
       </aside>
     </div>
   );

@@ -112,10 +112,13 @@ pub fn update_status(
     status: &str,
     error_message: Option<&str>,
 ) -> Result<()> {
-    conn.execute(
+    let changed = conn.execute(
         "UPDATE books SET status = ?1, error_message = ?2, updated_at = CURRENT_TIMESTAMP WHERE id = ?3",
         params![status, error_message, id],
     )?;
+    if changed == 0 {
+        return Err(AppError::NotFound(format!("book {id}")));
+    }
     Ok(())
 }
 
@@ -125,10 +128,13 @@ pub fn update_metadata(
     author: Option<&str>,
     language: Option<&str>,
 ) -> Result<()> {
-    conn.execute(
+    let changed = conn.execute(
         "UPDATE books SET author = COALESCE(?1, author), language = COALESCE(?2, language), updated_at = CURRENT_TIMESTAMP WHERE id = ?3",
         params![author, language, id],
     )?;
+    if changed == 0 {
+        return Err(AppError::NotFound(format!("book {id}")));
+    }
     Ok(())
 }
 
@@ -142,8 +148,14 @@ pub fn insert_source(
     clean_text: Option<&str>,
 ) -> Result<i64> {
     conn.execute(
-        "INSERT OR IGNORE INTO sources (book_id, url, title, site, raw_html, clean_text) \
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+        "INSERT INTO sources (book_id, url, title, site, raw_html, clean_text) \
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6) \
+         ON CONFLICT(book_id, url) DO UPDATE SET \
+           title = COALESCE(excluded.title, sources.title), \
+           site = COALESCE(excluded.site, sources.site), \
+           raw_html = COALESCE(excluded.raw_html, sources.raw_html), \
+           clean_text = COALESCE(excluded.clean_text, sources.clean_text), \
+           fetched_at = CURRENT_TIMESTAMP",
         params![book_id, url, title, site, raw_html, clean_text],
     )?;
     let id: Option<i64> = conn

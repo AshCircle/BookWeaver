@@ -16,7 +16,6 @@ dist-ssr
 
 # rust / tauri
 src-tauri/target
-src-tauri/Cargo.lock
 
 # env / secrets
 .env

@@ -1,3 +1,4 @@
+use rusqlite::OptionalExtension;
 use tracing::info;
 
 use super::PipelineCtx;
@@ -34,7 +35,7 @@ pub async fn run(ctx: &PipelineCtx, book_id: i64) -> Result<()> {
                         rusqlite::params![src_id],
                         |row| row.get(0),
                     )
-                    .ok()
+                    .optional()?
                     .flatten();
                 Ok(txt.unwrap_or_default())
             })

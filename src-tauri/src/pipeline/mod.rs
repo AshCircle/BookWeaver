@@ -37,6 +37,18 @@ impl Stage {
             Stage::Ready => "ready",
         }
     }
+
+    fn from_label(s: &str) -> Option<Stage> {
+        match s {
+            "search" => Some(Stage::Search),
+            "collect" => Some(Stage::Collect),
+            "structure" => Some(Stage::Structure),
+            "cluster" => Some(Stage::Cluster),
+            "synthesis" => Some(Stage::Synthesis),
+            "ready" => Some(Stage::Ready),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, Serialize)]
@@ -93,22 +105,52 @@ pub async fn run(ctx: PipelineCtx, book_id: i64) {
         Ok(()) => {
             info!(book_id, "pipeline complete");
             let db = ctx.db.clone();
-            let _ = tokio::task::spawn_blocking(move || {
+            let update = tokio::task::spawn_blocking(move || {
                 db.with(|conn| crate::db::repo::update_status(conn, book_id, "ready", None))
             })
             .await;
-            ctx.emit(book_id, Stage::Ready, StageStatus::Done, None);
-            let _ = ctx.app.emit("book.ready", &serde_json::json!({ "book_id": book_id }));
+            match update {
+                Ok(Ok(())) => {
+                    ctx.emit(book_id, Stage::Ready, StageStatus::Done, None);
+                    let _ = ctx
+                        .app
+                        .emit("book.ready", &serde_json::json!({ "book_id": book_id }));
+                }
+                inner => {
+                    let msg = match inner {
+                        Ok(Err(e)) => e.to_string(),
+                        Err(e) => e.to_string(),
+                        Ok(Ok(())) => unreachable!(),
+                    };
+                    error!(book_id, %msg, "failed to mark book ready");
+                    let _ = ctx.app.emit(
+                        "book.failed",
+                        &serde_json::json!({ "book_id": book_id, "error": msg }),
+                    );
+                }
+            }
         }
         Err(e) => {
             error!(book_id, ?e, "pipeline failed");
             let msg = e.to_string();
+            let failed_stage = match &e {
+                AppError::Pipeline { stage, .. } => Stage::from_label(stage),
+                _ => None,
+            };
             let db = ctx.db.clone();
             let m = msg.clone();
-            let _ = tokio::task::spawn_blocking(move || {
+            let update = tokio::task::spawn_blocking(move || {
                 db.with(|conn| crate::db::repo::update_status(conn, book_id, "failed", Some(&m)))
             })
             .await;
+            match update {
+                Ok(Ok(())) => {}
+                Ok(Err(ue)) => error!(book_id, ?ue, "failed to mark book failed"),
+                Err(je) => error!(book_id, ?je, "join error while marking book failed"),
+            }
+            if let Some(stage) = failed_stage {
+                ctx.emit(book_id, stage, StageStatus::Failed, Some(msg.clone()));
+            }
             let _ = ctx.app.emit(
                 "book.failed",
                 &serde_json::json!({ "book_id": book_id, "error": msg }),
